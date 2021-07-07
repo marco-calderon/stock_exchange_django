@@ -1,0 +1,1 @@
+web: gunicorn stock_exchange_django.wsgi
