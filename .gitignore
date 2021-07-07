@@ -1,0 +1,4 @@
+db.sqlite3
+logs
+venv
+**/__pycache__
