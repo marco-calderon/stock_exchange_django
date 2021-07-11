@@ -4,6 +4,7 @@ class Record(models.Model):
     date = models.DateTimeField()
     currency_code = models.CharField(max_length=10)
     rate = models.DecimalField(max_digits=20, decimal_places=10)
+    other = None
 
     def to_dict(self):
         return {
