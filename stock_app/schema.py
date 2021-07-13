@@ -73,11 +73,11 @@ class Query(ObjectType):
         end_timestamp=Int()
     )
 
-    def resolve_week_records(root, info, code_from, code_to, **kwargs):
+    def resolve_week_records(root, info, code_from, code_to):
         start_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=7)
         end_date = start_date + timedelta(days=8)
-        week_from_records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_from))
-        week_to_records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_to))
+        week_from_records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_from)).order_by('-date')
+        week_to_records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_to)).order_by('-date')
         week_records = []
         
         for from_record in week_from_records:
@@ -96,7 +96,7 @@ class Query(ObjectType):
     def resolve_comparison_records(root, info, code_from, code_to, start_timestamp, end_timestamp):
         start_date = datetime.fromtimestamp(start_timestamp)
         end_date = datetime.fromtimestamp(end_timestamp)
-        records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_to))
+        records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_to)).order_by('-date')
         return records
 
 schema = Schema(query=Query)
