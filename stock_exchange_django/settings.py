@@ -30,7 +30,9 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'http://localhost:19006',
+]
 
 
 # Application definition
@@ -42,9 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'stock_app',
     'graphene_django',
     'corsheaders',
-    'stock_app',
 ]
 
 MIDDLEWARE = [
