@@ -5,15 +5,22 @@ from datetime import datetime, timedelta
 import graphql
 
 class RecordType(DjangoObjectType):
+    source_currency_code = Field(String)
     currency_code = Field(String)
     prev_rate = Field(Decimal)
     difference = Field(Decimal)
 
     class Meta:
         model = Record
-        fields = ('id', 'date', 'currency_code', 'rate', 'prev_rate', 'difference')
+        fields = ('id', 'date', 'source_currency_code', 'currency_code', 'rate', 'prev_rate', 'difference')
 
-    def resolve_currency_code(self, info, **kwargs):
+    def resolve_source_currency_code(self, info):
+        if self.other is not None:
+            return self.other.currency_code[2:5]
+        else:
+            return 'USD'
+
+    def resolve_currency_code(self, info):
         return self.currency_code[2:5]
 
     def resolve_prev_rate(self, info):
