@@ -75,7 +75,7 @@ class Query(ObjectType):
 
     def resolve_week_records(root, info, code_from, code_to):
         start_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=7)
-        end_date = start_date + timedelta(days=8)
+        end_date = start_date + timedelta(days=7)
         week_from_records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_from)).order_by('-date')
         week_to_records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_to)).order_by('-date')
         week_records = []
