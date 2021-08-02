@@ -1,6 +1,6 @@
+import logging
 import environ
 from open_exchange_rates import OpenExchangeRates
-from django.shortcuts import render
 from .models import Record
 from datetime import datetime, timedelta
 from django.http import JsonResponse
@@ -13,21 +13,41 @@ def scrap(request):
         start_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         end_date = start_date + timedelta(hours=23, minutes=59)
 
+        # Avoid adding duplicated objects if it exists.
         results = Record.objects.filter(date__gte=start_date, date__lte=end_date).first()
         if results is not None:
-            return
+            return JsonResponse({ 'message': 'Already added for today', 'ok': False })
         
         api = OpenExchangeRates()
         data = api.get_today()
 
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date + timedelta(days=1)
+        prev_rate = 0.0
+        difference = 0.0
+        prev_record = None
+
         if data['rates']:
             codes = list(data['rates'].keys())
             for code in codes:
+                try:
+                    # Gets the previous entry
+                    prev_record = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code=code)[0]
+                except Exception:
+                    pass
+                    
                 r = Record()
                 r.date = datetime.now()
                 r.currency_code = code,
                 r.rate = float(data['rates'][code])
+                if prev_record is not None:
+                    # Set if found
+                    prev_rate = prev_record.rate
+                    difference = r.rate - prev_record.rate
+                    r.prev_rate = prev_rate
+                    r.difference = difference
                 r.save()
+
         return JsonResponse({ 'message': 'Successfully saved', 'ok': True })
     else:
         return JsonResponse({ 'message': 'Key not provided or invalid', 'ok': False })

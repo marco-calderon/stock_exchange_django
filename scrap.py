@@ -63,5 +63,42 @@ def update():
         print('Added {0} records.'.format(len(codes)))
 
 
+@database.command('fix')
+def fix():
+    from stock_app.models import Record
+
+    all_records = Record.objects.all()
+    for record in all_records:
+        logging.info('Trying to update record {0}.'.format(str(record)))
+        print('Trying to update record {0}.'.format(str(record)))
+
+        # Filtering params for last day
+        start_date = record.date.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)
+        end_date = start_date + timedelta(days=1)
+        prev_rate = 0.0
+        difference = 0.0
+
+        try:
+            # Gets the previous entry
+            prev_record = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code=record.currency_code)[0]
+            
+            if prev_record is not None:
+                # Update if found
+                prev_rate = prev_record.rate
+                difference = record.rate - prev_record.rate
+                record.prev_rate = prev_rate
+                record.difference = difference
+                record.save()
+                logging.info('Updated record {0}.'.format(str(record)))
+                print('Updated record {0}.'.format(str(record)))
+            else:
+                logging.info('Not found prev record for {0}.'.format(str(record)))
+                print('Not found prev record for {0}.'.format(str(record)))
+
+        except Exception:
+            logging.info('Not found prev record for {0}.'.format(str(record)))
+            print('Not found prev record for {0}.'.format(str(record)))
+
+
 if __name__ == "__main__":
     main()

@@ -4,6 +4,8 @@ class Record(models.Model):
     date = models.DateTimeField()
     currency_code = models.CharField(max_length=10)
     rate = models.DecimalField(max_digits=20, decimal_places=10)
+    prev_rate = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    difference = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
     other = None
 
     def to_dict(self):
@@ -11,7 +13,9 @@ class Record(models.Model):
             'id': self.pk,
             'date': self.date,
             'currency_code': self.currency_code,
-            'rate': self.rate
+            'rate': self.rate,
+            'prev_rate': self.prev_rate,
+            'difference': self.difference
         }
 
     def __repr__(self):
