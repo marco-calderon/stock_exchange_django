@@ -2,7 +2,6 @@ from stock_app.models import Record
 from graphene import ObjectType, String, Schema, Field, List, Decimal, Int
 from graphene_django import DjangoObjectType
 from datetime import datetime, timedelta
-import graphql
 
 class RecordType(DjangoObjectType):
     source_currency_code = Field(String)
@@ -24,42 +23,20 @@ class RecordType(DjangoObjectType):
         return self.currency_code[2:5]
 
     def resolve_prev_rate(self, info):
-        start_date = self.date.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)
-        end_date = start_date + timedelta(days=1)
         try:
-            # Gets the previous entry
-            prev_record = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code=self.currency_code)[0]
-            # Gets the analog previous currency entry
-            prev_record_other = None
             if self.other is not None:
-                prev_record_other = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code=self.other.currency_code)[0]
-                
-            if prev_record is not None and prev_record_other is not None:
-                return prev_record_other.rate / prev_record.rate
-            elif prev_record is not None:
-                return prev_record.rate
+                return self.other.prev_rate / self.prev_rate
             else:
-                return 0
+                return self.prev_rate
         except Exception:
             return None
 
     def resolve_difference(self, info):
-        start_date = self.date.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=1)
-        end_date = start_date + timedelta(days=1)
         try:
-            # Gets the previous entry
-            prev_record = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code=self.currency_code)[0]
-            # Gets the analog previous currency entry
-            prev_record_other = None
             if self.other is not None:
-                prev_record_other = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code=self.other.currency_code)[0]
-            
-            if prev_record is not None and prev_record_other is not None:
-                return self.rate - (prev_record_other.rate / prev_record.rate)
-            elif prev_record is not None:
-                return self.rate - prev_record.rate
+                return self.rate - (self.other.prev_rate / self.prev_rate)
             else:
-                return 0
+                return self.rate / self.prev_rate
         except Exception:
             return None
 
