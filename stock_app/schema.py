@@ -96,7 +96,21 @@ class Query(ObjectType):
     def resolve_comparison_records(root, info, code_from, code_to, start_timestamp, end_timestamp):
         start_date = datetime.fromtimestamp(start_timestamp)
         end_date = datetime.fromtimestamp(end_timestamp)
-        records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_to)).order_by('-date')
+        from_records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_from)).order_by('-date')
+        to_records = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code_to)).order_by('-date')
+        records = []
+        
+        for from_record in from_records:
+            start = from_record.date.replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=1)
+            to_records = list(filter(lambda to_record: start <= to_record.date and end >= to_record.date, to_records))
+            if len(to_records) > 0:
+                to_record = to_records[0]
+                if code_from != 'USD':
+                    to_record.rate = from_record.rate / to_record.rate
+                    to_record.other = from_record
+                records.append(to_record)
+
         return records
 
 schema = Schema(query=Query)
