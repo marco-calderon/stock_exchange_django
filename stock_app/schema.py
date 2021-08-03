@@ -36,7 +36,7 @@ class RecordType(DjangoObjectType):
             if self.other is not None:
                 return self.rate - (self.other.prev_rate / self.prev_rate)
             else:
-                return self.rate / self.prev_rate
+                return self.rate - self.prev_rate
         except Exception:
             return None
 
