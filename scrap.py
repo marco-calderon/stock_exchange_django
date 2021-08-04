@@ -64,10 +64,20 @@ def update():
 
 
 @database.command('fix')
-def fix():
+@click.option('--id', help='the beginning id')
+def fix(id):
     from stock_app.models import Record
 
-    all_records = Record.objects.all()
+    all_records = []
+    if id is not None:
+        all_records = Record.objects.filter(id__gte=id)
+        logging.info('Beginning from id {0}'.format(id))
+        print('Beginning from id {0}'.format(id))
+    else:
+        all_records = Record.objects.all()
+        logging.info('Checking for all database records')
+        print('Checking for all database records')
+
     for record in all_records:
         logging.info('Trying to update record {0}.'.format(str(record)))
         print('Trying to update record {0}.'.format(str(record)))
