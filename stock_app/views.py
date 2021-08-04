@@ -32,7 +32,7 @@ def scrap(request):
             for code in codes:
                 try:
                     # Gets the previous entry
-                    prev_record = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code=code)[0]
+                    prev_record = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code))[0]
                 except Exception:
                     pass
                     
