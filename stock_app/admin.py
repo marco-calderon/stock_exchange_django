@@ -2,4 +2,4 @@ from stock_app.models import Record
 from django.contrib import admin
 
 # Register your models here.
-admin.register(Record)
+admin.site.register(Record)
