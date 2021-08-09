@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from stock_app.views import scrap
+from stock_app.views import keep_awake, scrap
 from django.contrib import admin
 from django.urls import path
 from graphene_django.views import GraphQLView
@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('graphql', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path('scrap/', scrap, name='entries_scrap'),
+    path('keep_awake/', keep_awake, name='keep_awake'),
 ]

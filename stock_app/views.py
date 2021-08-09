@@ -6,6 +6,9 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 from decimal import *
 
+def keep_awake(request):
+    return JsonResponse({ 'message': 'Successfully saved', 'ok': True })
+
 # Create your views here.
 def scrap(request):
     env = environ.Env()
