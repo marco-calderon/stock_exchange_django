@@ -4,6 +4,7 @@ from open_exchange_rates import OpenExchangeRates
 from .models import Record
 from datetime import datetime, timedelta
 from django.http import JsonResponse
+from decimal import *
 
 # Create your views here.
 def scrap(request):
@@ -43,7 +44,7 @@ def scrap(request):
                 if prev_record is not None:
                     # Set if found
                     prev_rate = prev_record.rate
-                    difference = r.rate - prev_record.rate
+                    difference = Decimal(r.rate) - Decimal(prev_record.rate)
                     r.prev_rate = prev_rate
                     r.difference = difference
                 r.save()
