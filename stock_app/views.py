@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from decimal import *
 
 def keep_awake(request):
-    return JsonResponse({ 'message': 'Successfully saved', 'ok': True })
+    return JsonResponse({ 'message': 'OK', 'ok': True })
 
 # Create your views here.
 def scrap(request):
