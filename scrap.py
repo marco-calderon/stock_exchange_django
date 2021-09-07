@@ -47,13 +47,9 @@ def get(date):
         logging.info('Records are present for the date. Skipping...')
         print('Records are present for the date. Skipping...')
         return
-    
-    api = OpenExchangeRates()
-    data = api.get_today()
-    logging.info(json.dumps(data))
 
     api = OpenExchangeRates()
-    data = api.get_today()
+    data = api.get_from_date(get_date)
 
     start_date = start_date - timedelta(days=1)
     end_date = start_date + timedelta(days=1)
@@ -73,7 +69,7 @@ def get(date):
                 pass
                 
             r = Record()
-            r.date = datetime.now()
+            r.date = get_date
             r.currency_code = code,
             r.rate = float(data['rates'][code])
             if prev_record is not None:
@@ -83,6 +79,8 @@ def get(date):
                 r.prev_rate = prev_rate
                 r.difference = difference
             r.save()
+            logging.info('Added record {0}.'.format(str(r)))
+            print('Added record {0}.'.format(str(r)))
         logging.info('Added {0} records.'.format(len(codes)))
         print('Added {0} records.'.format(len(codes)))
 
