@@ -1,3 +1,4 @@
+from decimal import Decimal
 from open_exchange_rates import OpenExchangeRates
 import click
 import logging
@@ -28,6 +29,62 @@ def main():
 @main.group('database')
 def database():
     pass
+
+
+@database.command('get')
+@click.option('--date', help='the date')
+def get(date):
+    from stock_app.models import Record
+
+    get_date = datetime.strptime(date, '%Y-%m-%d')
+    logging.info('Updating exchange rates from date {0}...'.format(get_date))
+    start_date = get_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_date = start_date + timedelta(hours=23, minutes=59)
+    logging.debug('start_date used: {0}'.format(start_date.isoformat()))
+
+    results = Record.objects.filter(date__gte=start_date, date__lte=end_date).first()
+    if results is not None:
+        logging.info('Records are present for the date. Skipping...')
+        print('Records are present for the date. Skipping...')
+        return
+    
+    api = OpenExchangeRates()
+    data = api.get_today()
+    logging.info(json.dumps(data))
+
+    api = OpenExchangeRates()
+    data = api.get_today()
+
+    start_date = start_date - timedelta(days=1)
+    end_date = start_date + timedelta(days=1)
+    prev_rate = 0.0
+    difference = 0.0
+    prev_record = None
+
+    if data['rates']:
+        logging.info('Adding records for selected date')
+        print('Adding records for selected date')
+        codes = list(data['rates'].keys())
+        for code in codes:
+            try:
+                # Gets the previous entry
+                prev_record = Record.objects.filter(date__gte=start_date, date__lte=end_date, currency_code="('{0}',)".format(code))[0]
+            except Exception:
+                pass
+                
+            r = Record()
+            r.date = datetime.now()
+            r.currency_code = code,
+            r.rate = float(data['rates'][code])
+            if prev_record is not None:
+                # Set if found
+                prev_rate = prev_record.rate
+                difference = Decimal(r.rate) - Decimal(prev_record.rate)
+                r.prev_rate = prev_rate
+                r.difference = difference
+            r.save()
+        logging.info('Added {0} records.'.format(len(codes)))
+        print('Added {0} records.'.format(len(codes)))
 
 
 @database.command('update')
