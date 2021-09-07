@@ -59,6 +59,9 @@ def scrap(request):
             return JsonResponse({ 'message': 'Already added for today', 'ok': False })
         
         # Execute async task for scrapping and storing into database
+        loop = asyncio.get_event_loop()
+        asyncio.set_event_loop(loop)
+        asyncio.events._set_running_loop(loop)
         asyncio.create_task(scrap_store_task())
 
         return JsonResponse({ 'message': 'Successfully queued scrap task', 'ok': True })
