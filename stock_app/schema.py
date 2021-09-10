@@ -81,7 +81,7 @@ class Query(ObjectType):
             start = from_record.date.replace(hour=0, minute=0, second=0, microsecond=0)
             end = start + timedelta(days=1)
             to_records = list(filter(lambda to_record: start <= to_record.date and end >= to_record.date, week_to_records))
-            if len(to_records) > 0:
+            if len(to_records) > 0 and from_record.date != to_records[0].date:
                 to_record = to_records[0]
                 if code_from != 'USD':
                     to_record.rate = from_record.rate / to_record.rate
