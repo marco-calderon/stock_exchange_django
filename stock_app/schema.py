@@ -11,7 +11,7 @@ class RecordType(DjangoObjectType):
 
     class Meta:
         model = Record
-        fields = ('id', 'date', 'code_from', 'code_to', 'rate', 'prev_rate', 'difference')
+        fields = ('id', 'date', 'from_code', 'to_code', 'rate', 'prev_rate', 'difference')
 
     def resolve_code_from(self, info):
         if self.other is not None:
