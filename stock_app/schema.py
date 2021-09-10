@@ -4,14 +4,14 @@ from graphene_django import DjangoObjectType
 from datetime import datetime, timedelta
 
 class RecordType(DjangoObjectType):
-    from_code = Field(String)
-    to_code = Field(String)
+    code_from = Field(String)
+    code_to = Field(String)
     prev_rate = Field(Decimal)
     difference = Field(Decimal)
 
     class Meta:
         model = Record
-        fields = ('id', 'date', 'from_code', 'to_code', 'rate', 'prev_rate', 'difference')
+        fields = ('id', 'date', 'code_from', 'code_to', 'rate', 'prev_rate', 'difference')
 
     def resolve_code_from(self, info):
         if self.other is not None:
